@@ -79,3 +79,26 @@ plt.title('Top 15 Regiões com Crimes', color = 'Black', fontweight = 'bold', fo
 
 plt.xticks(rotation = 90)
 plt.show()
+
+#Regiões com dias de crimes
+
+plt.style.use('seaborn')
+
+data['DayOfWeek'].value_counts().head(15).plot.pie(figsize = (15, 8), explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1))
+
+plt.title('Contagem de Crime a cada Dia', fontweight = 'bold', fontsize = 20)
+
+plt.xticks(rotation = 90)
+plt.show()
+
+data['Date'] = pd.to_datetime(data['Date'])
+
+data['Month'] = data['Date'].dt.month
+
+plt.style.use('fivethirtyeight')
+plt.rcParams['figure.figsize'] = (15, 8)
+
+sns.countplot(data['Month'], palette = 'autumn')
+plt.title('Crimes a Cada Mês', fontweight = 'bold', fontsize = 20)
+
+plt.show()

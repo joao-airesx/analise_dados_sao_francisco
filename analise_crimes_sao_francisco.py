@@ -91,14 +91,51 @@ plt.title('Contagem de Crime a cada Dia', fontweight = 'bold', fontsize = 20)
 plt.xticks(rotation = 90)
 plt.show()
 
-data['Date'] = pd.to_datetime(data['Date'])
+from warnings import *
+filterwarnings('ignore')
 
-data['Month'] = data['Date'].dt.month
+color = plt.cm.twilight(np.linspace(0, 5, 100))
+data['Time'].value_counts().head(20).plot.bar(color = color, figsize = (15,9))
 
-plt.style.use('fivethirtyeight')
-plt.rcParams['figure.figsize'] = (15, 8)
-
-sns.countplot(data['Month'], palette = 'autumn')
-plt.title('Crimes a Cada Mês', fontweight = 'bold', fontsize = 20)
+plt.title('Distribuição de crimes ao longo do dia',fontweight = 'bold' ,fontsize = 20)
 
 plt.show()
+
+df = pd.crosstab(data['Category'], data ['PdDistrict'])
+
+color = plt.cm.Greys(np.linspace(0,1,10))
+
+df.div(df.sum(1).astype(float), axis = 0).plot.bar(stacked = True, color = color, figsize = (18, 12))
+
+plt.title('Distrito vs Categoria de Crime', fontweight = 'bold', fontsize = 20)
+plt.xticks(rotation = 90)
+
+plt.show()
+
+t = data.PdDistrict.value_counts()
+table = pd.DataFrame(data=t.values, index= t.index, columns=['Count'])
+table = table.reindex(["CENTRAL", "NORTHERN", "PARK", "SOUTHERN", "MISSION", "TENDERLOIN", "RICHMOND", "TARAVAL", "INGLESIDE", "BAYVIEW"])
+
+table = table.reset_index()
+
+table.rename({'index': 'Neighborhood'}, axis='columns', inplace=True)
+
+print(table)
+
+gjson = r'https://cocl.us/sanfran_geojson'
+sf_map = folium.Map(location = [37.77, -122.42], zoom_start = 12)
+
+#gerando mapa
+
+sf_map.choropleth(
+    geo_data = gjson,
+    data = table,
+    columns = ['PdDistrict','Count'],
+    key_on = 'feature.properties.DISTRICT',
+    fill_color = 'YlOrRd',
+    fill_opacity = 0.7,
+    line_opacity = 0.2,
+    legend_name = 'Taxa de criminalidade em São Francisco'
+)
+
+sf_map
